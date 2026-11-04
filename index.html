@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jeeva's Training Week</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;700;800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+
+/* Layout: single mobile column — stats strip, day picker, today's session + meals, then weekly reference */
+:root{
+  --bg:#EDF0F3; --surface:#FFFFFF; --ink:#14202B; --muted:#5A6874; --line:#D3DAE1;
+  --lift:#1F5FD1; --lift-soft:#E3ECFC; --food:#B4530A; --food-soft:#FCEFE2; --done:#2F7D4F;
+  --display:"Saira Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E141A; --surface:#161F28; --ink:#E6ECF1; --muted:#94A2AE; --line:#27323D;
+  --lift:#78A2FF; --lift-soft:#1B2A45; --food:#F2A65E; --food-soft:#3A2817; --done:#5FC28A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E141A; --surface:#161F28; --ink:#E6ECF1; --muted:#94A2AE; --line:#27323D;
+  --lift:#78A2FF; --lift-soft:#1B2A45; --food:#F2A65E; --food-soft:#3A2817; --done:#5FC28A; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:2.4rem;font-weight:800;text-transform:uppercase;letter-spacing:.01em}
+h2{font-size:1.5rem;font-weight:700;text-transform:uppercase;letter-spacing:.02em}
+h3{font-size:1.15rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.eyebrow{font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+p{margin:0}
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+
+header{display:flex;flex-direction:column;gap:6px}
+.goal{font-size:.95rem;color:var(--muted);max-width:60ch}
+
+/* scan strip — reads like the gym receipt */
+.scan{display:grid;grid-template-columns:repeat(4,1fr);border:1px dashed var(--line);border-radius:6px;background:var(--surface)}
+.scan div{padding:10px 8px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.scan div+div{border-left:1px dashed var(--line)}
+.scan b{font-family:var(--display);font-size:1.45rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.scan span{font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.scan .t b{color:var(--lift)}
+.scan .p b{color:var(--food)}
+
+/* day picker */
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:8px 0 7px;font-family:var(--display);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0}
+.day .d{font-size:1.05rem;font-weight:700;text-transform:uppercase}
+.day .s{font-size:.62rem;font-family:var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.day[aria-pressed="true"]{background:var(--lift);border-color:var(--lift);color:var(--bg)}
+.day[aria-pressed="true"] .s{color:var(--bg);opacity:.85}
+.day.today:not([aria-pressed="true"]){border-color:var(--lift)}
+.day:focus-visible,.chk:focus-visible{outline:2px solid var(--lift);outline-offset:2px}
+
+/* session */
+.panel{display:flex;flex-direction:column;gap:12px}
+.panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.tag{font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
+.tag.lift{background:var(--lift-soft);color:var(--lift)}
+.tag.food{background:var(--food-soft);color:var(--food)}
+.progress{font-size:.8rem;color:var(--muted)}
+
+.list{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.ex{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--line)}
+.ex:first-child{border-top:0}
+.ex label{display:contents;cursor:pointer}
+.chk{appearance:none;width:24px;height:24px;border:2px solid var(--line);border-radius:6px;background:var(--surface);cursor:pointer;display:grid;place-content:center;margin:0}
+.chk:checked{background:var(--done);border-color:var(--done)}
+.chk:checked::after{content:"";width:6px;height:11px;border:solid var(--bg);border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.ex .name{font-weight:600;min-width:0}
+.ex .hint{display:block;font-size:.8rem;font-weight:400;color:var(--muted)}
+.ex .sets{font-family:var(--display);font-size:1.15rem;font-weight:700;color:var(--lift);white-space:nowrap;font-variant-numeric:tabular-nums}
+.ex.is-done .name{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
+.ex.warm .sets{color:var(--muted)}
+
+.rest-card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px}
+
+/* meals */
+.meal{display:grid;grid-template-columns:76px 1fr auto;gap:12px;padding:12px 14px;border-top:1px solid var(--line);align-items:start}
+.meal:first-child{border-top:0}
+.meal .when{font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--food);padding-top:2px}
+.meal .what{min-width:0}
+.meal .what b{font-weight:600}
+.meal .macro{text-align:right;font-size:.78rem;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums;line-height:1.35}
+.meal .macro strong{display:block;font-family:var(--display);font-size:1.05rem;color:var(--ink)}
+.meal.addon{background:var(--food-soft)}
+.total{display:flex;justify-content:space-between;align-items:baseline;padding:12px 14px;border-top:2px solid var(--ink);font-variant-numeric:tabular-nums;gap:8px;flex-wrap:wrap}
+.total b{font-family:var(--display);font-size:1.25rem}
+
+/* reference sections */
+section.ref{display:flex;flex-direction:column;gap:10px}
+.rules{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.rules li{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.rules li b{font-weight:600}
+.week{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:.9rem}
+.week th,.week td{padding:9px 12px;text-align:left;border-top:1px solid var(--line)}
+.week th{font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:1rem;width:56px}
+.week tr:first-child th,.week tr:first-child td{border-top:0}
+.week td.c{color:var(--muted);font-size:.82rem}
+.shop{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.shop div{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;min-width:0}
+.shop b{font-family:var(--display);font-size:1.25rem;font-variant-numeric:tabular-nums}
+.shop span{font-size:.82rem;color:var(--muted)}
+footer{font-size:.78rem;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+@media (max-width:380px){
+  .scan{grid-template-columns:repeat(2,1fr)}
+  .scan div:nth-child(3){border-left:0}
+  .scan div:nth-child(n+3){border-top:1px dashed var(--line)}
+  .meal{grid-template-columns:1fr auto}
+  .meal .when{grid-column:1/-1;padding:0}
+}
+@media (prefers-reduced-motion:no-preference){.day,.chk{transition:background .15s,border-color .15s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">The Gym Group · Aylesbury</span>
+    <h1>Training Week</h1>
+    <p class="goal">Goal: lose fat while building muscle. Train 6 days, rest on Monday, and eat about 2,300 kcal with plenty of protein from cheap, ready-to-use supermarket food.</p>
+  </header>
+
+  <div class="scan" aria-label="Body scan, 3 Nov 2026">
+    <div><b>87.7</b><span>kg weight</span></div>
+    <div><b>20.2%</b><span>body fat</span></div>
+    <div class="t"><b class="num">2,300</b><span>kcal / day</span></div>
+    <div class="p"><b>140g</b><span>protein / day</span></div>
+  </div>
+
+  <nav class="days" id="days" aria-label="Choose a day"></nav>
+
+  <div class="panel" id="workout"></div>
+  <div class="panel" id="meals"></div>
+
+  <section class="ref">
+    <h2>The Week</h2>
+    <p class="muted" style="margin-top:-4px">Workout and dinner for each day.</p>
+    <table class="week">
+      <tr><th>Mon</th><td>Rest · 30–45 min walk</td><td class="c">Korma + bread</td></tr>
+      <tr><th>Tue</th><td>Push</td><td class="c">Beans, eggs on toast</td></tr>
+      <tr><th>Wed</th><td>Pull</td><td class="c">Butter chicken + bread</td></tr>
+      <tr><th>Thu</th><td>Legs</td><td class="c">Pasta + chicken</td></tr>
+      <tr><th>Fri</th><td>Push</td><td class="c">Tikka + bread</td></tr>
+      <tr><th>Sat</th><td>Pull</td><td class="c">Pot noodle + eggs</td></tr>
+      <tr><th>Sun</th><td>Legs</td><td class="c">Beans, eggs on toast</td></tr>
+    </table>
+  </section>
+
+  <section class="ref">
+    <h2>How to Train</h2>
+    <ul class="rules">
+      <li><b>3 sets of 8–12 reps</b> on every machine, with 60–90 seconds rest between sets.</li>
+      <li><b>Go up in weight</b> when you hit 12 reps on all 3 sets. Write the weight down so you can beat it next week.</li>
+      <li><b>Training early?</b> A banana before is enough fuel. Eat your porridge as soon as you're home, because that's your main recovery meal.</li>
+      <li><b>Warm up</b> with 5 minutes on the bike or treadmill, then one light set on the first machine.</li>
+      <li><b>Finish with 15 minutes</b> of incline walking on the treadmill. This helps burn fat without hurting recovery.</li>
+      <li><b>Leave 1–2 reps in the tank</b> on most sets. Stop if anything feels sharp or painful.</li>
+    </ul>
+  </section>
+
+  <section class="ref">
+    <h2>Food Rules</h2>
+    <ul class="rules">
+      <li><b>Hit about 140g protein</b> a day (about 1.6g per kg). Every day in this plan lands between 115g and 140g.</li>
+      <li><b>Lunch is a café sandwich.</b> Chicken, egg or ham fillings give the most protein. Avoid cheese-and-mayo-heavy ones.</li>
+      <li><b>Curry pots 3 nights a week.</b> They cost the most per meal, so beans, pasta and eggs fill the other nights.</li>
+      <li><b>Pot noodle once a week.</b> It's the lowest-protein dinner, so don't skip the 2 eggs.</li>
+      <li><b>Stir in frozen veg</b> to the pasta and curry. It's cheap, needs no chopping, and adds fibre.</li>
+      <li><b>Drink 2.5–3 litres of water</b> a day, plus extra on training days.</li>
+      <li><b>Weigh in every 2 weeks</b> at the same time of day. Aim to lose 0.3–0.5 kg a week. If you're losing faster, add a slice of toast with peanut butter.</ul>
+  </section>
+
+  <section class="ref">
+    <h2>Weekly Shop</h2>
+    <p class="muted" style="margin-top:-4px">Everything is available at Sainsbury's. Pick the Sainsbury's own-brand or Stamford Street budget range, and use Nectar prices where you can. Roughly £30–35 a week, not counting your café sandwiches, but check prices in store.</p>
+    <div class="shop">
+      <div><b>1kg</b><span>Porridge oats (lasts 2 weeks)</span></div>
+      <div><b>4 pints</b><span>Semi-skimmed milk</span></div>
+      <div><b>13</b><span>Bananas</span></div>
+      <div><b>1 jar</b><span>Peanut butter</span></div>
+      <div><b>500g + 1 jar</b><span>Dried pasta + tomato pasta sauce</span></div>
+      <div><b>1 pack</b><span>Cooked chicken pieces</span></div>
+      <div><b>3 × 500g</b><span>0% fat Greek yogurt</span></div>
+      <div><b>30</b><span>Eggs (2 × 15 pack)</span></div>
+      <div><b>~210g</b><span>Pumpkin seeds</span></div>
+      <div><b>3 pots</b><span>Curry: korma, butter chicken, tikka</span></div>
+      <div><b>1 pack</b><span>Lebanese bread</span></div>
+      <div><b>2 tins + 1 loaf</b><span>Baked beans + wholemeal bread</span></div>
+      <div><b>1 bag</b><span>Frozen mixed veg</span></div>
+      <div><b>1</b><span>Pot noodle</span></div>
+    </div>
+  </section>
+
+  <footer>Calories and protein are approximate. Check the labels on your packs, because Sainsbury's pack sizes vary. Based on your 3 Nov 2026 body scan: 87.7 kg, 1.75 m, 20.2% body fat.</footer>
+</div>
+
+<script>
+const W = {
+  push:{name:"Push",focus:"Chest · Shoulders · Triceps",ex:[
+    ["Converging shoulder press","Shoulders","3 × 8–12"],
+    ["Pectoral fly","Chest","3 × 10–12"],
+    ["Seated dip","Chest · triceps","3 × 8–12"],
+    ["Triceps extension","Triceps","3 × 10–12"],
+    ["Abdominal crunch","Core","3 × 15"],
+    ["Incline treadmill walk","Fat burn","15 min"]]},
+  pull:{name:"Pull",focus:"Back · Rear shoulders · Biceps",ex:[
+    ["Lat pull","Back width","3 × 8–12"],
+    ["Diverging lat pull down","Back","3 × 10–12"],
+    ["Diverging seated row","Mid back","3 × 8–12"],
+    ["Rear delt","Rear shoulders","3 × 12–15"],
+    ["Arm curl","Biceps","3 × 10–12"],
+    ["Abdominal crunch","Core","3 × 15"],
+    ["Incline treadmill walk","Fat burn","15 min"]]},
+  legs:{name:"Legs",focus:"Quads · Hamstrings · Calves",ex:[
+    ["Leg press","Quads · glutes","3 × 8–12"],
+    ["Prone leg curl","Hamstrings","3 × 10–12"],
+    ["Leg extension","Quads","3 × 10–12"],
+    ["Hip adduction","Inner thigh","3 × 12–15"],
+    ["Calf press","Calves","3 × 15–20"],
+    ["Incline treadmill walk","Fat burn","15 min"]]}
+};
+// order: Mon..Sun
+const PLAN = [
+  {d:"Mon",w:null,din:"curry",curry:"Chicken korma"},
+  {d:"Tue",w:"push",din:"beans"},
+  {d:"Wed",w:"pull",din:"curry",curry:"Butter chicken"},
+  {d:"Thu",w:"legs",din:"pasta"},
+  {d:"Fri",w:"push",din:"curry",curry:"Chicken tikka masala"},
+  {d:"Sat",w:"pull",din:"noodle"},
+  {d:"Sun",w:"legs",din:"beans"}
+];
+
+function dinner(p){
+  if(p.din==="curry"){const k=/korma/i.test(p.curry);return [`<b>${p.curry}</b> pot + 1 Lebanese bread`,k?760:670,36];}
+  if(p.din==="beans") return ["<b>Beans on toast</b>: 1 tin baked beans + 2 slices wholemeal toast + 2 fried or poached eggs",660,40];
+  if(p.din==="pasta") return ["<b>Pasta</b>: 100g pasta (dry weight) + ½ jar tomato sauce + 100g cooked chicken + a handful of frozen veg",600,40];
+  return ["<b>Pot noodle</b> with 2 eggs cracked in while it's hot",520,20];
+}
+function meals(p){
+  const m=[];
+  if(p.w) m.push(["Wake up","1 banana + a glass of water, 15–30 min before the gym. Black coffee is fine too.",105,1]);
+  m.push([p.w?"After gym":"Breakfast","<b>Porridge</b>: 60g oats + 300ml milk, topped with 1 banana + 1 tbsp peanut butter. Eat it within an hour of training.".replace(p.w?"":" Eat it within an hour of training.",""),575,22]);
+  m.push(["Lunch","<b>Sandwich from the café</b>. Pick chicken, egg or ham fillings, and go easy on mayo and cheese.",450,25]);
+  m.push(["Snack","200g 0% Greek yogurt + 30g pumpkin seeds",280,29]);
+  const d=dinner(p); m.push(["Dinner",d[0],d[1],d[2]]);
+  m.push(["Evening","3 boiled eggs",210,18]);
+  return m;
+}
+
+const todayIdx = (new Date().getDay()+6)%7; // Mon=0
+let sel = todayIdx;
+const dateKey = new Date().toISOString().slice(0,10);
+
+function load(){try{return JSON.parse(localStorage.getItem("ticks-"+dateKey)||"{}")}catch(e){return {}}}
+function save(t){try{localStorage.setItem("ticks-"+dateKey,JSON.stringify(t))}catch(e){}}
+
+function renderDays(){
+  const nav=document.getElementById("days");
+  nav.innerHTML=PLAN.map((p,i)=>`<button class="day${i===todayIdx?" today":""}" id="day-${p.d}" aria-pressed="${i===sel}" data-i="${i}"><span class="d">${p.d}</span><span class="s">${p.w?W[p.w].name:"Rest"}</span></button>`).join("");
+  nav.querySelectorAll(".day").forEach(b=>b.onclick=()=>{sel=+b.dataset.i;render()});
+}
+
+function renderWorkout(){
+  const p=PLAN[sel], el=document.getElementById("workout");
+  const label = sel===todayIdx?"Today":p.d;
+  if(!p.w){
+    el.innerHTML=`<div class="panel-head"><h2>${label} · Rest Day</h2><span class="tag lift">Recover</span></div>
+    <div class="rest-card"><p><b>No weights today.</b> Your muscles grow while you rest.</p>
+    <p class="muted">Go for a 30–45 minute walk, sleep 7–8 hours, and still hit your protein. Food is lighter today because there's no pre-gym snack.</p></div>`;
+    return;
+  }
+  const w=W[p.w], ticks=load(), key=p.d;
+  const done=w.ex.filter((_,i)=>ticks[key+i]).length;
+  el.innerHTML=`<div class="panel-head"><h2>${label} · ${w.name}</h2><span class="progress num" id="prog">${done} / ${w.ex.length} done</span></div>
+  <p class="muted" style="margin-top:-6px">${w.focus}</p>
+  <ul class="list">${w.ex.map((e,i)=>`<li class="ex${ticks[key+i]?" is-done":""}${e[2].includes("min")?" warm":""}">
+    <label for="ex-${key}-${i}"><input type="checkbox" class="chk" id="ex-${key}-${i}" data-k="${key+i}" ${ticks[key+i]?"checked":""}>
+    <span class="name">${e[0]}<span class="hint">${e[1]}</span></span><span class="sets">${e[2]}</span></label></li>`).join("")}</ul>`;
+  el.querySelectorAll(".chk").forEach(c=>c.onchange=()=>{
+    const t=load(); if(c.checked)t[c.dataset.k]=1; else delete t[c.dataset.k]; save(t);
+    c.closest(".ex").classList.toggle("is-done",c.checked);
+    const n=el.querySelectorAll(".chk:checked").length;
+    document.getElementById("prog").textContent=`${n} / ${w.ex.length} done`;
+  });
+}
+
+function renderMeals(){
+  const p=PLAN[sel], m=meals(p);
+  const kcal=m.reduce((a,x)=>a+x[2],0), pro=m.reduce((a,x)=>a+x[3],0);
+  document.getElementById("meals").innerHTML=`<div class="panel-head"><h2>Meals</h2><span class="tag food">${p.w?"Training day":"Rest day"}</span></div>
+  <div class="list">${m.map(x=>`<div class="meal"><span class="when">${x[0]}</span><span class="what">${x[1]}</span><span class="macro"><strong>${x[3]}g</strong>${x[2]} kcal</span></div>`).join("")}
+  <div class="total"><span>Day total</span><b class="num">${kcal.toLocaleString()} kcal · ${pro}g protein</b></div></div>`;
+}
+
+function render(){renderDays();renderWorkout();renderMeals()}
+render();
+</script>
+</body>
+</html>
