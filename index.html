@@ -82,6 +82,9 @@ header{display:flex;flex-direction:column;gap:6px}
 .ex.is-done .name{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
 .ex.warm .sets{color:var(--muted)}
 
+.steps{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:6px}
+.steps li::marker{color:var(--food);font-weight:700}
+.rest-card h3{color:var(--food)}
 .rest-card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px}
 
 /* meals */
@@ -160,7 +163,7 @@ footer{font-size:.78rem;color:var(--muted);border-top:1px solid var(--line);padd
     <ul class="rules">
       <li><b>3 sets of 8–12 reps</b> on every machine, with 60–90 seconds rest between sets.</li>
       <li><b>Go up in weight</b> when you hit 12 reps on all 3 sets. Write the weight down so you can beat it next week.</li>
-      <li><b>Training early?</b> A banana before is enough fuel. Eat your porridge as soon as you're home, because that's your main recovery meal.</li>
+      <li><b>Training early?</b> A banana before is enough fuel. Eat your overnight oats as soon as you're home, because that's your main recovery meal.</li>
       <li><b>Warm up</b> with 5 minutes on the bike or treadmill, then one light set on the first machine.</li>
       <li><b>Finish with 15 minutes</b> of incline walking on the treadmill. This helps burn fat without hurting recovery.</li>
       <li><b>Leave 1–2 reps in the tank</b> on most sets. Stop if anything feels sharp or painful.</li>
@@ -170,13 +173,39 @@ footer{font-size:.78rem;color:var(--muted);border-top:1px solid var(--line);padd
   <section class="ref">
     <h2>Food Rules</h2>
     <ul class="rules">
-      <li><b>Hit about 140g protein</b> a day (about 1.6g per kg). Every day in this plan lands between 115g and 140g.</li>
+      <li><b>Hit about 140g protein</b> a day (about 1.6g per kg). Every day in this plan lands between 110g and 135g.</li>
       <li><b>Lunch is a café sandwich.</b> Chicken, egg or ham fillings give the most protein. Avoid cheese-and-mayo-heavy ones.</li>
       <li><b>Curry pots 3 nights a week.</b> They cost the most per meal, so beans, pasta and eggs fill the other nights.</li>
       <li><b>Pot noodle once a week.</b> It's the lowest-protein dinner, so don't skip the 2 eggs.</li>
       <li><b>Stir in frozen veg</b> to the pasta and curry. It's cheap, needs no chopping, and adds fibre.</li>
       <li><b>Drink 2.5–3 litres of water</b> a day, plus extra on training days.</li>
       <li><b>Weigh in every 2 weeks</b> at the same time of day. Aim to lose 0.3–0.5 kg a week. If you're losing faster, add a slice of toast with peanut butter.</ul>
+  </section>
+
+  <section class="ref">
+    <h2>Recipes</h2>
+    <div class="rest-card">
+      <h3>Overnight Oats</h3>
+      <p class="muted">Make it before bed. It takes 3 minutes, and you eat it cold after the gym. 1 jar ≈ 590 kcal · 22g protein.</p>
+      <ol class="steps">
+        <li>Add <b>60g oats</b> and <b>250ml semi-skimmed milk</b> to a jar or tub and stir.</li>
+        <li>Mash in <b>½ banana</b> and stir in <b>1 tbsp peanut butter</b>.</li>
+        <li>Top with <b>a handful (about 80g) of frozen mixed berries</b>. They thaw overnight and add juice.</li>
+        <li>Put the lid on and leave it in the fridge overnight.</li>
+        <li>In the morning, slice the other <b>½ banana</b> on top. Add a splash of milk if it's too thick.</li>
+      </ol>
+      <p class="muted">Tip: make 3 jars at once on Sunday and Wednesday nights. They keep for 3 days in the fridge.</p>
+    </div>
+    <div class="rest-card">
+      <h3>Cottage Cheese + Pineapple</h3>
+      <p class="muted">Afternoon snack, ready in 1 minute. ≈ 210 kcal · 22g protein.</p>
+      <ol class="steps">
+        <li>Spoon <b>200g reduced-fat cottage cheese</b> into a bowl or tub.</li>
+        <li>Drain <b>100g tinned pineapple</b> (about ⅓ of a 432g tin) and stir it in.</li>
+        <li>Put the leftover pineapple in a closed tub in the fridge. It keeps for 3 days.</li>
+      </ol>
+      <p class="muted">Tip: pack it in a tub and take it to work.</p>
+    </div>
   </section>
 
   <section class="ref">
@@ -189,13 +218,13 @@ footer{font-size:.78rem;color:var(--muted);border-top:1px solid var(--line);padd
       <div><b>1 jar</b><span>Peanut butter</span></div>
       <div><b>500g + 1 jar</b><span>Dried pasta + tomato pasta sauce</span></div>
       <div><b>1 pack</b><span>Cooked chicken pieces</span></div>
-      <div><b>3 × 500g</b><span>0% fat Greek yogurt</span></div>
+      <div><b>5 × 300g</b><span>Reduced-fat cottage cheese</span></div>
       <div><b>30</b><span>Eggs (2 × 15 pack)</span></div>
-      <div><b>~210g</b><span>Pumpkin seeds</span></div>
+      <div><b>3 tins</b><span>Pineapple in juice (not syrup)</span></div>
       <div><b>3 pots</b><span>Curry: korma, butter chicken, tikka</span></div>
       <div><b>1 pack</b><span>Lebanese bread</span></div>
       <div><b>2 tins + 1 loaf</b><span>Baked beans + wholemeal bread</span></div>
-      <div><b>1 bag</b><span>Frozen mixed veg</span></div>
+      <div><b>2 bags</b><span>Frozen mixed veg + frozen mixed berries</span></div>
       <div><b>1</b><span>Pot noodle</span></div>
     </div>
   </section>
@@ -248,9 +277,9 @@ function dinner(p){
 function meals(p){
   const m=[];
   if(p.w) m.push(["Wake up","1 banana + a glass of water, 15–30 min before the gym. Black coffee is fine too.",105,1]);
-  m.push([p.w?"After gym":"Breakfast","<b>Porridge</b>: 60g oats + 300ml milk, topped with 1 banana + 1 tbsp peanut butter. Eat it within an hour of training.".replace(p.w?"":" Eat it within an hour of training.",""),575,22]);
+  m.push([p.w?"After gym":"Breakfast","<b>Overnight oats</b> (made the night before, see recipe below)"+(p.w?". Eat them within an hour of training.":""),590,22]);
   m.push(["Lunch","<b>Sandwich from the café</b>. Pick chicken, egg or ham fillings, and go easy on mayo and cheese.",450,25]);
-  m.push(["Snack","200g 0% Greek yogurt + 30g pumpkin seeds",280,29]);
+  m.push(["Snack","<b>Cottage cheese + pineapple</b>: 200g cottage cheese + 100g tinned pineapple",210,22]);
   const d=dinner(p); m.push(["Dinner",d[0],d[1],d[2]]);
   m.push(["Evening","3 boiled eggs",210,18]);
   return m;
